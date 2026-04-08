@@ -68,9 +68,6 @@ function IsoProfitLineExplorer() {
                     { type: "segment", point1: [0, 6], point2: [3, 4], color: "#F7B23B", weight: 2 },
                     { type: "segment", point1: [3, 4], point2: [5, 0], color: "#AC8BF9", weight: 2 },
 
-                    // Feasible region fill approximation (using segments for shading effect)
-                    { type: "circle", center: [2, 2.5], radius: 2.5, color: "#22c55e", fillOpacity: 0.1 },
-
                     // Corner points
                     { type: "point", x: 0, y: 0, color: "#64748b" },
                     { type: "point", x: 0, y: 6, color: "#64748b" },
