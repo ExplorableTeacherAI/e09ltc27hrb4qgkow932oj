@@ -27,61 +27,68 @@ function InteractiveConstraintBuilder() {
     const setVar = useSetVar();
 
     // Read constraint intercepts from store
-    const c1Intercept = useVar("constraint1Intercept", 8) as number;
-    const c2Intercept = useVar("constraint2Intercept", 6) as number;
+    const c1Intercept = useVar("constraint1Intercept", 6) as number; // Labor: y-intercept
+    const c2Intercept = useVar("constraint2Intercept", 10) as number; // Material: y-intercept
 
-    // Constraint 1: 2x + 3y ≤ 18 → y = (18 - 2x)/3 = 6 - (2/3)x
-    // But we let user adjust the intercept, so: y = c1Intercept - (2/3)x
+    // Constraint 1 (Labor): 2x + 3y ≤ 18 → y = c1Intercept - (2/3)x
     // x-intercept: when y=0, x = c1Intercept * 1.5
     const c1XIntercept = c1Intercept * 1.5;
 
-    // Constraint 2: 4x + 2y ≤ 20 → y = (20 - 4x)/2 = 10 - 2x
-    // User adjustable: y = c2Intercept - 2x, but x-intercept ratio is different
+    // Constraint 2 (Material): 4x + 2y ≤ 20 → y = c2Intercept - 2x
     // x-intercept: when y=0, x = c2Intercept / 2
-    const c2XIntercept = c2Intercept / 2 * (10 / 6); // Keep same slope ratio
+    const c2XIntercept = c2Intercept / 2;
 
     // Calculate feasible region vertices
     const vertices = useMemo(() => {
-        // Origin
-        const origin: [number, number] = [0, 0];
-
-        // Intersection with y-axis (x=0)
-        const yAxisC1: [number, number] = [0, Math.min(c1Intercept, 10)];
-
-        // Intersection with x-axis
-        const xAxisC2: [number, number] = [Math.min(c2XIntercept, 10), 0];
-
         // Intersection of the two constraint lines
         // Line 1: y = c1Intercept - (2/3)x
-        // Line 2: y = c2Intercept * (10/6) - 2x (adjusted for display)
-        // For simplicity, compute intersection assuming standard constraints
-        // 2x + 3y = 18 and 4x + 2y = 20
-        // Solving: x = 3, y = 4 (for standard case)
-        // We'll compute based on intercepts
-        const slope1 = -2/3;
-        const slope2 = -2;
-        const intersectionX = (c2Intercept * (10/6) - c1Intercept) / (slope1 - slope2);
-        const intersectionY = c1Intercept + slope1 * intersectionX;
-        const intersection: [number, number] = [
-            Math.max(0, Math.min(intersectionX, 10)),
-            Math.max(0, Math.min(intersectionY, 10))
-        ];
+        // Line 2: y = c2Intercept - 2x
+        // c1Intercept - (2/3)x = c2Intercept - 2x
+        // 2x - (2/3)x = c2Intercept - c1Intercept
+        // (4/3)x = c2Intercept - c1Intercept
+        // x = (c2Intercept - c1Intercept) * 3/4
+        const intersectionX = (c2Intercept - c1Intercept) * 3 / 4;
+        const intersectionY = c1Intercept - (2/3) * intersectionX;
 
-        return { origin, yAxisC1, xAxisC2, intersection };
-    }, [c1Intercept, c2Intercept, c2XIntercept]);
+        // Determine the vertices of the feasible region (bounded by both constraints and axes)
+        const yAxisIntercept = Math.min(c1Intercept, c2Intercept);
+        const xAxisIntercept = Math.min(c1XIntercept, c2XIntercept);
+
+        // Check if intersection is in first quadrant and within bounds
+        const hasValidIntersection = intersectionX > 0 && intersectionY > 0 &&
+            intersectionX < xAxisIntercept && intersectionY < yAxisIntercept;
+
+        return {
+            origin: [0, 0] as [number, number],
+            yAxis: [0, yAxisIntercept] as [number, number],
+            xAxis: [xAxisIntercept, 0] as [number, number],
+            intersection: hasValidIntersection
+                ? [intersectionX, intersectionY] as [number, number]
+                : null,
+        };
+    }, [c1Intercept, c2Intercept, c1XIntercept, c2XIntercept]);
 
     // Handle dragging constraint lines via points
     const handleConstraint1Drag = useCallback((point: [number, number]) => {
-        // Map y-coordinate to intercept value
-        const newIntercept = Math.max(4, Math.min(12, point[1]));
+        const newIntercept = Math.max(2, Math.min(10, point[1]));
         setVar("constraint1Intercept", Math.round(newIntercept * 2) / 2);
     }, [setVar]);
 
     const handleConstraint2Drag = useCallback((point: [number, number]) => {
-        // Map y-coordinate to intercept value
-        const newIntercept = Math.max(3, Math.min(10, point[1]));
+        const newIntercept = Math.max(2, Math.min(12, point[1]));
         setVar("constraint2Intercept", Math.round(newIntercept * 2) / 2);
     }, [setVar]);
+
+    // Build feasible region polygon points for shading
+    const feasiblePolygon = useMemo(() => {
+        const points: [number, number][] = [vertices.origin];
+        points.push(vertices.yAxis);
+        if (vertices.intersection) {
+            points.push(vertices.intersection);
+        }
+        points.push(vertices.xAxis);
+        return points;
+    }, [vertices]);
 
     return (
         <div className="relative">
@@ -97,14 +104,44 @@ function InteractiveConstraintBuilder() {
                         position: [0, c1Intercept],
                     },
                     {
-                        initial: [0, c2Intercept * (10/6)],
+                        initial: [0, c2Intercept],
                         color: "#AC8BF9",
                         constrain: "vertical",
                         onChange: handleConstraint2Drag,
-                        position: [0, c2Intercept * (10/6)],
+                        position: [0, c2Intercept],
                     },
                 ]}
                 plots={[
+                    // Feasible region shading (using polygon approximation with segments)
+                    // We'll draw filled segments to approximate the shaded area
+                    ...feasiblePolygon.slice(0, -1).map((_, i) => ({
+                        type: "segment" as const,
+                        point1: feasiblePolygon[i],
+                        point2: feasiblePolygon[i + 1],
+                        color: "#22c55e",
+                        weight: 1,
+                    })),
+                    // Close the polygon
+                    {
+                        type: "segment" as const,
+                        point1: feasiblePolygon[feasiblePolygon.length - 1],
+                        point2: feasiblePolygon[0],
+                        color: "#22c55e",
+                        weight: 1,
+                    },
+
+                    // Feasible region fill (circle approximation for visual effect)
+                    {
+                        type: "circle" as const,
+                        center: [
+                            (vertices.origin[0] + vertices.yAxis[0] + (vertices.intersection?.[0] ?? vertices.xAxis[0]) + vertices.xAxis[0]) / 4,
+                            (vertices.origin[1] + vertices.yAxis[1] + (vertices.intersection?.[1] ?? vertices.yAxis[1]) + vertices.xAxis[1]) / 4,
+                        ] as [number, number],
+                        radius: 2.5,
+                        color: "#22c55e",
+                        fillOpacity: 0.15,
+                    },
+
                     // Non-negativity constraints (axes)
                     { type: "segment", point1: [0, 0], point2: [10, 0], color: "#94a3b8", weight: 2 },
                     { type: "segment", point1: [0, 0], point2: [0, 10], color: "#94a3b8", weight: 2 },
@@ -118,20 +155,20 @@ function InteractiveConstraintBuilder() {
                         domain: [0, c1XIntercept] as [number, number],
                     },
 
-                    // Constraint 2 line (Material): y = intercept - 2x (scaled)
+                    // Constraint 2 line (Material): y = c2Intercept - 2x
                     {
                         type: "function",
-                        fn: (x: number) => c2Intercept * (10/6) - 2 * x,
+                        fn: (x: number) => c2Intercept - 2 * x,
                         color: "#AC8BF9",
                         weight: 3,
                         domain: [0, c2XIntercept] as [number, number],
                     },
 
-                    // Feasible region vertices
+                    // Feasible region corner points
                     { type: "point", x: 0, y: 0, color: "#22c55e" },
-                    { type: "point", x: 0, y: Math.min(c1Intercept, c2Intercept * (10/6)), color: "#22c55e" },
-                    { type: "point", x: vertices.intersection[0], y: vertices.intersection[1], color: "#22c55e" },
-                    { type: "point", x: Math.min(c1XIntercept, c2XIntercept), y: 0, color: "#22c55e" },
+                    { type: "point", x: vertices.yAxis[0], y: vertices.yAxis[1], color: "#22c55e" },
+                    ...(vertices.intersection ? [{ type: "point" as const, x: vertices.intersection[0], y: vertices.intersection[1], color: "#22c55e" }] : []),
+                    { type: "point", x: vertices.xAxis[0], y: vertices.xAxis[1], color: "#22c55e" },
                 ]}
             />
             <InteractionHintSequence
