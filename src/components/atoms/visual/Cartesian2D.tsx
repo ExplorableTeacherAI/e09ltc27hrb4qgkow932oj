@@ -6,6 +6,7 @@ import {
     Point,
     Line,
     Circle,
+    Polygon,
     useMovablePoint,
 } from "mafs";
 import { useVar, useSetVar } from "@/stores/variableStore";
@@ -86,13 +87,28 @@ export interface CirclePlot {
     highlightId?: string;
 }
 
+/** A filled polygon defined by an array of vertices */
+export interface PolygonPlot {
+    type: "polygon";
+    /** Array of [x, y] points defining the polygon vertices */
+    points: [number, number][];
+    color?: string;
+    /** Fill opacity (default 0.15) */
+    fillOpacity?: number;
+    /** Stroke weight (default 2) */
+    weight?: number;
+    strokeStyle?: "solid" | "dashed";
+    highlightId?: string;
+}
+
 export type PlotItem =
     | FunctionPlot
     | ParametricPlot
     | StaticPoint
     | VectorPlot
     | SegmentPlot
-    | CirclePlot;
+    | CirclePlot
+    | PolygonPlot;
 
 // ── Movable point configuration ───────────────────────────────────────────────
 
@@ -320,6 +336,24 @@ function renderPlotItem(
                     radius={item.radius}
                     color={item.color}
                     fillOpacity={(item.fillOpacity ?? 0.15) * opacity}
+                    strokeStyle={item.strokeStyle}
+                />
+            );
+        }
+
+        case "polygon": {
+            const { opacity, weight } = getHighlightStyle(
+                item.highlightId,
+                activeId,
+                item.weight ?? 2
+            );
+            return (
+                <Polygon
+                    key={key}
+                    points={item.points}
+                    color={item.color}
+                    fillOpacity={(item.fillOpacity ?? 0.15) * opacity}
+                    weight={weight}
                     strokeStyle={item.strokeStyle}
                 />
             );

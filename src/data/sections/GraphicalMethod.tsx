@@ -112,34 +112,13 @@ function InteractiveConstraintBuilder() {
                     },
                 ]}
                 plots={[
-                    // Feasible region shading (using polygon approximation with segments)
-                    // We'll draw filled segments to approximate the shaded area
-                    ...feasiblePolygon.slice(0, -1).map((_, i) => ({
-                        type: "segment" as const,
-                        point1: feasiblePolygon[i],
-                        point2: feasiblePolygon[i + 1],
-                        color: "#22c55e",
-                        weight: 1,
-                    })),
-                    // Close the polygon
+                    // Feasible region shading (proper filled polygon)
                     {
-                        type: "segment" as const,
-                        point1: feasiblePolygon[feasiblePolygon.length - 1],
-                        point2: feasiblePolygon[0],
+                        type: "polygon" as const,
+                        points: feasiblePolygon,
                         color: "#22c55e",
-                        weight: 1,
-                    },
-
-                    // Feasible region fill (circle approximation for visual effect)
-                    {
-                        type: "circle" as const,
-                        center: [
-                            (vertices.origin[0] + vertices.yAxis[0] + (vertices.intersection?.[0] ?? vertices.xAxis[0]) + vertices.xAxis[0]) / 4,
-                            (vertices.origin[1] + vertices.yAxis[1] + (vertices.intersection?.[1] ?? vertices.yAxis[1]) + vertices.xAxis[1]) / 4,
-                        ] as [number, number],
-                        radius: 2.5,
-                        color: "#22c55e",
-                        fillOpacity: 0.15,
+                        fillOpacity: 0.2,
+                        weight: 2,
                     },
 
                     // Non-negativity constraints (axes)
