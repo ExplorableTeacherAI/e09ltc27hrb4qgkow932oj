@@ -600,49 +600,54 @@ function Vector3D({
     shaftRadius?: number;
     opacity?: number;
 }) {
-    const direction = useMemo(() => {
-        const dir = new THREE.Vector3(
+    // Calculate all derived values in a single useMemo to avoid conditional hook calls
+    const vectorData = useMemo(() => {
+        const direction = new THREE.Vector3(
             tip[0] - tail[0],
             tip[1] - tail[1],
             tip[2] - tail[2]
         );
-        return dir;
-    }, [tail, tip]);
+        const length = direction.length();
 
-    const length = direction.length();
-    if (length < 0.001) return null;
+        if (length < 0.001) {
+            return null;
+        }
 
-    const arrowHeadLength = Math.min(length * 0.2, 0.3);
-    const shaftLength = length - arrowHeadLength;
+        const arrowHeadLength = Math.min(length * 0.2, 0.3);
+        const shaftLength = length - arrowHeadLength;
 
-    const midpoint = useMemo(
-        () =>
-            new THREE.Vector3(
-                tail[0] + (direction.x / length) * (shaftLength / 2),
-                tail[1] + (direction.y / length) * (shaftLength / 2),
-                tail[2] + (direction.z / length) * (shaftLength / 2)
-            ),
-        [tail, direction, length, shaftLength]
-    );
+        const midpoint = new THREE.Vector3(
+            tail[0] + (direction.x / length) * (shaftLength / 2),
+            tail[1] + (direction.y / length) * (shaftLength / 2),
+            tail[2] + (direction.z / length) * (shaftLength / 2)
+        );
 
-    const arrowBase = useMemo(
-        () =>
-            new THREE.Vector3(
-                tail[0] + (direction.x / length) * (shaftLength + arrowHeadLength / 2),
-                tail[1] + (direction.y / length) * (shaftLength + arrowHeadLength / 2),
-                tail[2] + (direction.z / length) * (shaftLength + arrowHeadLength / 2)
-            ),
-        [tail, direction, length, shaftLength, arrowHeadLength]
-    );
+        const arrowBase = new THREE.Vector3(
+            tail[0] + (direction.x / length) * (shaftLength + arrowHeadLength / 2),
+            tail[1] + (direction.y / length) * (shaftLength + arrowHeadLength / 2),
+            tail[2] + (direction.z / length) * (shaftLength + arrowHeadLength / 2)
+        );
 
-    // Quaternion to rotate cylinder from Y-up to the vector direction
-    const quaternion = useMemo(() => {
-        const q = new THREE.Quaternion();
+        // Quaternion to rotate cylinder from Y-up to the vector direction
+        const quaternion = new THREE.Quaternion();
         const up = new THREE.Vector3(0, 1, 0);
         const normalized = direction.clone().normalize();
-        q.setFromUnitVectors(up, normalized);
-        return q;
-    }, [direction]);
+        quaternion.setFromUnitVectors(up, normalized);
+
+        return {
+            direction,
+            length,
+            arrowHeadLength,
+            shaftLength,
+            midpoint,
+            arrowBase,
+            quaternion,
+        };
+    }, [tail, tip]);
+
+    if (!vectorData) return null;
+
+    const { arrowHeadLength, shaftLength, midpoint, arrowBase, quaternion } = vectorData;
 
     return (
         <group>

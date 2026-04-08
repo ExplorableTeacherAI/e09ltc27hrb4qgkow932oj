@@ -259,6 +259,17 @@ export const EditableText: React.FC<EditableTextProps> = ({
         }
     }, [handleSlashKeyDown]);
 
+    // Handle input events — forward to slash command detector
+    const handleInput = useCallback(() => {
+        handleSlashInput();
+    }, [handleSlashInput]);
+
+    // Close slash menu when leaving edit mode
+    const handleBlurWithSlash = useCallback(() => {
+        handleCloseSlashMenu();
+        handleBlur();
+    }, [handleCloseSlashMenu, handleBlur]);
+
     // Disable editing when mode changes
     useEffect(() => {
         if (!isEditor) {
@@ -270,17 +281,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
     if (!isEditor) {
         return React.createElement(Component, { id, className }, children);
     }
-
-    // Handle input events — forward to slash command detector
-    const handleInput = useCallback(() => {
-        handleSlashInput();
-    }, [handleSlashInput]);
-
-    // Close slash menu when leaving edit mode
-    const handleBlurWithSlash = useCallback(() => {
-        handleCloseSlashMenu();
-        handleBlur();
-    }, [handleCloseSlashMenu, handleBlur]);
 
     return (
         <EditableTextContext.Provider value={{ isParentEditable: isContentEditable, skipBlurRef }}>
