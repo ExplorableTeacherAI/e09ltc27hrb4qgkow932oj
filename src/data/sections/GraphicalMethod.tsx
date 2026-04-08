@@ -134,14 +134,6 @@ function InteractiveConstraintBuilder() {
                         weight: 3,
                         domain: [0, c1XIntercept] as [number, number],
                     },
-                    // Equation label for Constraint 1 (Labor)
-                    {
-                        type: "label",
-                        x: c1XIntercept * 0.55,
-                        y: c1Intercept - (2/3) * (c1XIntercept * 0.55) + 0.8,
-                        text: "y = " + c1Intercept + " − ⅔x",
-                        color: "#F7B23B",
-                    },
 
                     // Constraint 2 line (Material): y = c2Intercept - 2x
                     {
@@ -150,14 +142,6 @@ function InteractiveConstraintBuilder() {
                         color: "#AC8BF9",
                         weight: 3,
                         domain: [0, c2XIntercept] as [number, number],
-                    },
-                    // Equation label for Constraint 2 (Material)
-                    {
-                        type: "label",
-                        x: c2XIntercept * 0.6,
-                        y: c2Intercept - 2 * (c2XIntercept * 0.6) + 0.8,
-                        text: "y = " + c2Intercept + " − 2x",
-                        color: "#AC8BF9",
                     },
 
                     // Feasible region corner points
@@ -177,6 +161,29 @@ function InteractiveConstraintBuilder() {
                     },
                 ]}
             />
+            {/* Equation labels */}
+            <div
+                className="absolute px-2 py-1 rounded text-sm font-semibold bg-white/90 backdrop-blur-sm shadow-sm pointer-events-none"
+                style={{
+                    top: '25%',
+                    left: '45%',
+                    color: '#F7B23B',
+                    border: '1px solid #F7B23B'
+                }}
+            >
+                y = {c1Intercept} − ⅔x
+            </div>
+            <div
+                className="absolute px-2 py-1 rounded text-sm font-semibold bg-white/90 backdrop-blur-sm shadow-sm pointer-events-none"
+                style={{
+                    top: '55%',
+                    left: '25%',
+                    color: '#AC8BF9',
+                    border: '1px solid #AC8BF9'
+                }}
+            >
+                y = {c2Intercept} − 2x
+            </div>
             {/* Zoom controls */}
             <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
                 <button
