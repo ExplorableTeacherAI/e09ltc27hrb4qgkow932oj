@@ -33,16 +33,13 @@ function IsoProfitLineExplorer() {
         return (objectiveZ - 40 * x) / 30;
     }, [objectiveZ]);
 
-    // Constrain the movable point to the iso-profit line
-    const constrainToLine = useCallback((point: [number, number]): [number, number] => {
-        const x = Math.max(0, Math.min(7, point[0]));
-        const y = (objectiveZ - 40 * x) / 30;
-        return [x, Math.max(-0.5, Math.min(10, y))];
-    }, [objectiveZ]);
+    // Calculate a point on the iso-profit line (use x=1.5 as a nice middle position)
+    const pointX = 1.5;
+    const pointY = (objectiveZ - 40 * pointX) / 30;
 
-    // Handle dragging the iso-profit line
+    // Handle dragging the iso-profit line - move perpendicular to line direction
     const handleLineDrag = useCallback((point: [number, number]) => {
-        // Calculate new Z based on point position
+        // Calculate new Z based on point position on the line 40x + 30y = Z
         const newZ = 40 * point[0] + 30 * point[1];
         const clampedZ = Math.max(0, Math.min(300, Math.round(newZ / 10) * 10));
         setVar("objectiveZ", clampedZ);
@@ -58,9 +55,9 @@ function IsoProfitLineExplorer() {
                 viewBox={{ x: [-1, 8], y: [-1, 8] }}
                 movablePoints={[
                     {
-                        initial: [objectiveZ / 40 / 2, objectiveZ / 30 / 2],
+                        initial: [pointX, pointY],
+                        position: [pointX, pointY],
                         color: "#22c55e",
-                        constrain: constrainToLine,
                         onChange: handleLineDrag,
                     },
                 ]}
