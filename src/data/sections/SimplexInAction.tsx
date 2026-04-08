@@ -15,7 +15,7 @@ import {
     numberPropsFromDefinition,
     choicePropsFromDefinition,
 } from "../variables";
-import { useVar } from "@/stores";
+import { useVar, useVariableStore } from "@/stores";
 
 // ========================================
 // INTERACTIVE SIMPLEX TABLEAU COMPONENT
@@ -23,6 +23,7 @@ import { useVar } from "@/stores";
 
 function InteractiveSimplexTableau() {
     const step = useVar("simplexStep", 0) as number;
+    const setVar = useVariableStore((s) => s.setVariable);
 
     // Define tableaux for each step
     const tableaux = useMemo(() => [
@@ -78,13 +79,14 @@ function InteractiveSimplexTableau() {
             {/* Step indicator */}
             <div className="flex items-center gap-3">
                 {tableaux.map((_, i) => (
-                    <div
+                    <button
                         key={i}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm
-                            ${i <= step ? "bg-[#62D0AD] text-white" : "bg-slate-200 text-slate-500"}`}
+                        onClick={() => setVar("simplexStep", i)}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm cursor-pointer transition-all hover:scale-110
+                            ${i === step ? "bg-[#62D0AD] text-white ring-2 ring-[#62D0AD] ring-offset-2" : i < step ? "bg-[#62D0AD]/60 text-white hover:bg-[#62D0AD]" : "bg-slate-200 text-slate-500 hover:bg-slate-300"}`}
                     >
                         {i + 1}
-                    </div>
+                    </button>
                 ))}
                 <span className="text-sm text-slate-600 ml-2">
                     {step < tableaux.length - 1 ? "In progress..." : "Optimal found!"}
