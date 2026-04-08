@@ -1,186 +1,343 @@
 /**
  * Variables Configuration
  * =======================
- * 
- * CENTRAL PLACE TO DEFINE ALL SHARED VARIABLES
- * 
- * This file defines all variables that can be shared across sections.
- * AI agents should read this file to understand what variables are available.
- * 
- * USAGE:
- * 1. Define variables here with their default values and metadata
- * 2. Use them in any section with: const x = useVar('variableName', defaultValue)
- * 3. Update them with: setVar('variableName', newValue)
+ *
+ * Linear Programming Lesson Variables
  */
 
 import { type VarValue } from '@/stores';
 
-/**
- * Variable definition with metadata
- */
 export interface VariableDefinition {
-    /** Default value */
     defaultValue: VarValue;
-    /** Human-readable label */
     label?: string;
-    /** Description for AI agents */
     description?: string;
-    /** Variable type hint */
     type?: 'number' | 'text' | 'boolean' | 'select' | 'array' | 'object' | 'spotColor' | 'linkedHighlight';
-    /** Unit (e.g., 'Hz', '°', 'm/s') - for numbers */
     unit?: string;
-    /** Minimum value (for number sliders) */
     min?: number;
-    /** Maximum value (for number sliders) */
     max?: number;
-    /** Step increment (for number sliders) */
     step?: number;
-    /** Display color for InlineScrubbleNumber / InlineSpotColor (e.g. '#D81B60') */
     color?: string;
-    /** Options for 'select' type variables */
     options?: string[];
-    /** Placeholder text for text inputs */
     placeholder?: string;
-    /** Correct answer for cloze input validation */
     correctAnswer?: string;
-    /** Whether cloze matching is case sensitive */
     caseSensitive?: boolean;
-    /** Background color for inline components */
     bgColor?: string;
-    /** Schema hint for object types (for AI agents) */
     schema?: string;
 }
 
-/**
- * =====================================================
- * 🎯 DEFINE YOUR VARIABLES HERE
- * =====================================================
- * 
- * SUPPORTED TYPES:
- * 
- * 1. NUMBER (slider):
- *    { defaultValue: 5, type: 'number', min: 0, max: 10, step: 1 }
- * 
- * 2. TEXT (free text):
- *    { defaultValue: 'Hello', type: 'text', placeholder: 'Enter text...' }
- * 
- * 3. SELECT (dropdown):
- *    { defaultValue: 'sine', type: 'select', options: ['sine', 'cosine', 'tangent'] }
- * 
- * 4. BOOLEAN (toggle):
- *    { defaultValue: true, type: 'boolean' }
- * 
- * 5. ARRAY (list of numbers):
- *    { defaultValue: [1, 2, 3], type: 'array' }
- * 
- * 6. OBJECT (complex data):
- *    { defaultValue: { x: 5, y: 10 }, type: 'object', schema: '{ x: number, y: number }' }
- */
 export const variableDefinitions: Record<string, VariableDefinition> = {
     // ========================================
-    // ADD YOUR VARIABLES HERE
+    // INTRODUCTION SECTION
     // ========================================
 
-    // Uncomment and modify these examples for your lesson:
-
-    /*
-    // ─────────────────────────────────────────
-    // NUMBER - Use with sliders
-    // ─────────────────────────────────────────
-    myValue: {
-        defaultValue: 5,
+    // Factory production example
+    productA: {
+        defaultValue: 4,
         type: 'number',
-        label: 'My Value',
-        description: 'A number that controls something',
-        unit: 'm',           // optional unit display
+        label: 'Units of Product A',
+        description: 'Number of units of product A to manufacture',
         min: 0,
         max: 10,
+        step: 1,
+        color: '#62D0AD',
+    },
+    productB: {
+        defaultValue: 3,
+        type: 'number',
+        label: 'Units of Product B',
+        description: 'Number of units of product B to manufacture',
+        min: 0,
+        max: 10,
+        step: 1,
+        color: '#8E90F5',
+    },
+    profitA: {
+        defaultValue: 40,
+        type: 'number',
+        label: 'Profit per unit A',
+        description: 'Profit earned per unit of product A',
+        min: 10,
+        max: 100,
+        step: 5,
+        color: '#62D0AD',
+    },
+    profitB: {
+        defaultValue: 30,
+        type: 'number',
+        label: 'Profit per unit B',
+        description: 'Profit earned per unit of product B',
+        min: 10,
+        max: 100,
+        step: 5,
+        color: '#8E90F5',
+    },
+
+    // ========================================
+    // GRAPHICAL METHOD SECTION
+    // ========================================
+
+    // Constraint line parameters (for interactive builder)
+    constraint1Intercept: {
+        defaultValue: 8,
+        type: 'number',
+        label: 'Constraint 1 Y-Intercept',
+        description: 'Y-intercept of the first constraint line',
+        min: 4,
+        max: 12,
         step: 0.5,
+        color: '#F7B23B',
+    },
+    constraint2Intercept: {
+        defaultValue: 6,
+        type: 'number',
+        label: 'Constraint 2 Y-Intercept',
+        description: 'Y-intercept of the second constraint line',
+        min: 3,
+        max: 10,
+        step: 0.5,
+        color: '#AC8BF9',
     },
 
-    // ─────────────────────────────────────────
-    // TEXT - Free text input
-    // ─────────────────────────────────────────
-    lessonTitle: {
-        defaultValue: 'My Lesson',
+    // Corner point exploration
+    cornerX: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Corner X',
+        description: 'X-coordinate of selected corner point',
+        min: 0,
+        max: 8,
+        step: 0.1,
+        color: '#ef4444',
+    },
+    cornerY: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Corner Y',
+        description: 'Y-coordinate of selected corner point',
+        min: 0,
+        max: 8,
+        step: 0.1,
+        color: '#ef4444',
+    },
+
+    // Objective function line
+    objectiveZ: {
+        defaultValue: 120,
+        type: 'number',
+        label: 'Objective Value Z',
+        description: 'Current value of the objective function',
+        min: 0,
+        max: 300,
+        step: 10,
+        color: '#22c55e',
+    },
+
+    // ========================================
+    // SOLVING GRAPHICALLY SECTION
+    // ========================================
+
+    // Solution point
+    solutionX: {
+        defaultValue: 4,
+        type: 'number',
+        label: 'Solution X',
+        description: 'X-coordinate of the optimal solution',
+        min: 0,
+        max: 8,
+        step: 0.5,
+        color: '#62D0AD',
+    },
+    solutionY: {
+        defaultValue: 2,
+        type: 'number',
+        label: 'Solution Y',
+        description: 'Y-coordinate of the optimal solution',
+        min: 0,
+        max: 8,
+        step: 0.5,
+        color: '#8E90F5',
+    },
+
+    // ========================================
+    // SIMPLEX METHOD SECTION
+    // ========================================
+
+    // Simplex tableau step
+    simplexStep: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Simplex Step',
+        description: 'Current step in the Simplex algorithm',
+        min: 0,
+        max: 3,
+        step: 1,
+        color: '#62CCF9',
+    },
+
+    // Pivot element highlight
+    pivotRow: {
+        defaultValue: 1,
+        type: 'number',
+        label: 'Pivot Row',
+        description: 'Row index of the pivot element',
+        min: 0,
+        max: 2,
+        step: 1,
+        color: '#F7B23B',
+    },
+    pivotCol: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Pivot Column',
+        description: 'Column index of the pivot element',
+        min: 0,
+        max: 4,
+        step: 1,
+        color: '#F7B23B',
+    },
+
+    // ========================================
+    // LINKED HIGHLIGHT VARIABLES
+    // ========================================
+
+    activeHighlight: {
+        defaultValue: '',
         type: 'text',
-        label: 'Lesson Title',
-        description: 'The title of your lesson',
-        placeholder: 'Enter a title...',
+        label: 'Active Highlight',
+        description: 'Currently highlighted element for linked highlighting',
+        color: '#8E90F5',
+        bgColor: 'rgba(142, 144, 245, 0.15)',
     },
 
-    // ─────────────────────────────────────────
-    // SELECT - Dropdown with options
-    // ─────────────────────────────────────────
-    difficulty: {
-        defaultValue: 'medium',
+    lpHighlight: {
+        defaultValue: '',
+        type: 'text',
+        label: 'LP Highlight',
+        description: 'Highlight for LP components visualization',
+        color: '#62D0AD',
+        bgColor: 'rgba(98, 208, 173, 0.15)',
+    },
+
+    // ========================================
+    // ASSESSMENT VARIABLES
+    // ========================================
+
+    // Introduction quiz
+    answerLPGoal: {
+        defaultValue: '',
         type: 'select',
-        label: 'Difficulty',
-        description: 'The difficulty level of the lesson',
-        options: ['easy', 'medium', 'hard', 'expert'],
+        label: 'LP Goal Answer',
+        description: 'Student answer for LP goal question',
+        placeholder: '???',
+        correctAnswer: 'maximize or minimize',
+        options: ['solve equations', 'maximize or minimize', 'graph functions', 'find derivatives'],
+        color: '#8E90F5',
     },
 
-    // ─────────────────────────────────────────
-    // BOOLEAN - Toggle switch
-    // ─────────────────────────────────────────
-    showHints: {
-        defaultValue: true,
-        type: 'boolean',
-        label: 'Show Hints',
-        description: 'Toggle to show or hide hints',
+    // Graphical method quiz
+    answerWhyCorners: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Why Corners Answer',
+        description: 'Student answer for why corners matter',
+        placeholder: '???',
+        correctAnswer: 'corners',
+        options: ['center', 'corners', 'edges', 'anywhere'],
+        color: '#62D0AD',
     },
 
-    // ─────────────────────────────────────────
-    // ARRAY - List of numbers
-    // ─────────────────────────────────────────
-    dataPoints: {
-        defaultValue: [1, 4, 9, 16, 25],
-        type: 'array',
-        label: 'Data Points',
-        description: 'Y-values for plotting a graph',
+    answerFeasibleRegion: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Feasible Region Answer',
+        description: 'Student answer about feasible region',
+        placeholder: '???',
+        correctAnswer: 'intersection',
+        color: '#F7B23B',
     },
 
-    // ─────────────────────────────────────────
-    // OBJECT - Complex structured data
-    // ─────────────────────────────────────────
-    graphSettings: {
-        defaultValue: { 
-            xMin: -10, 
-            xMax: 10, 
-            showGrid: true 
-        },
-        type: 'object',
-        label: 'Graph Settings',
-        description: 'Configuration for the graph display',
-        schema: '{ xMin: number, xMax: number, showGrid: boolean }',
+    // Solving graphically quiz
+    answerOptimalProfit: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Optimal Profit Answer',
+        description: 'Student answer for optimal profit calculation',
+        placeholder: '???',
+        correctAnswer: '220',
+        color: '#22c55e',
     },
-    */
+
+    answerOptimalX: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Optimal X Answer',
+        description: 'Student answer for optimal x value',
+        placeholder: '???',
+        correctAnswer: '4',
+        color: '#62D0AD',
+    },
+
+    answerOptimalY: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Optimal Y Answer',
+        description: 'Student answer for optimal y value',
+        placeholder: '???',
+        correctAnswer: '2',
+        color: '#8E90F5',
+    },
+
+    // Simplex quiz
+    answerSlackVariable: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Slack Variable Answer',
+        description: 'Student answer about slack variables',
+        placeholder: '???',
+        correctAnswer: 'convert to equality',
+        options: ['convert to equality', 'find the solution', 'draw the graph', 'calculate profit'],
+        color: '#AC8BF9',
+    },
+
+    answerPivotPurpose: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Pivot Purpose Answer',
+        description: 'Student answer about pivot operations',
+        placeholder: '???',
+        correctAnswer: 'move to better corner',
+        options: ['solve the equation', 'move to better corner', 'find the center', 'draw the line'],
+        color: '#F7B23B',
+    },
+
+    answerEnteringVariable: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Entering Variable Answer',
+        description: 'Student answer for which variable enters the basis',
+        placeholder: '???',
+        correctAnswer: 'most negative coefficient',
+        options: ['largest coefficient', 'most negative coefficient', 'smallest coefficient', 'zero coefficient'],
+        color: '#62CCF9',
+    },
 };
 
-/**
- * Get all variable names (for AI agents to discover)
- */
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
 export const getVariableNames = (): string[] => {
     return Object.keys(variableDefinitions);
 };
 
-/**
- * Get a variable's default value
- */
 export const getDefaultValue = (name: string): VarValue => {
     return variableDefinitions[name]?.defaultValue ?? 0;
 };
 
-/**
- * Get a variable's metadata
- */
 export const getVariableInfo = (name: string): VariableDefinition | undefined => {
     return variableDefinitions[name];
 };
 
-/**
- * Get all default values as a record (for initialization)
- */
 export const getDefaultValues = (): Record<string, VarValue> => {
     const defaults: Record<string, VarValue> = {};
     for (const [name, def] of Object.entries(variableDefinitions)) {
@@ -189,10 +346,6 @@ export const getDefaultValues = (): Record<string, VarValue> => {
     return defaults;
 };
 
-/**
- * Get number props for InlineScrubbleNumber from a variable definition.
- * Use with getVariableInfo(name) in blocks.tsx, or getExampleVariableInfo(name) in exampleBlocks.tsx.
- */
 export function numberPropsFromDefinition(def: VariableDefinition | undefined): {
     defaultValue?: number;
     min?: number;
@@ -210,14 +363,6 @@ export function numberPropsFromDefinition(def: VariableDefinition | undefined): 
     };
 }
 
-/**
- * Get cloze input props for InlineClozeInput from a variable definition.
- * Use with getVariableInfo(name) in blocks.tsx, or getExampleVariableInfo(name) in exampleBlocks.tsx.
- */
-/**
- * Get cloze choice props for InlineClozeChoice from a variable definition.
- * Use with getVariableInfo(name) in blocks.tsx.
- */
 export function choicePropsFromDefinition(def: VariableDefinition | undefined): {
     placeholder?: string;
     color?: string;
@@ -231,10 +376,6 @@ export function choicePropsFromDefinition(def: VariableDefinition | undefined): 
     };
 }
 
-/**
- * Get toggle props for InlineToggle from a variable definition.
- * Use with getVariableInfo(name) in blocks.tsx.
- */
 export function togglePropsFromDefinition(def: VariableDefinition | undefined): {
     color?: string;
     bgColor?: string;
@@ -261,18 +402,6 @@ export function clozePropsFromDefinition(def: VariableDefinition | undefined): {
     };
 }
 
-/**
- * Get spot-color props for InlineSpotColor from a variable definition.
- * Extracts the `color` field.
- *
- * @example
- * <InlineSpotColor
- *     varName="radius"
- *     {...spotColorPropsFromDefinition(getVariableInfo('radius'))}
- * >
- *     radius
- * </InlineSpotColor>
- */
 export function spotColorPropsFromDefinition(def: VariableDefinition | undefined): {
     color: string;
 } {
@@ -281,19 +410,6 @@ export function spotColorPropsFromDefinition(def: VariableDefinition | undefined
     };
 }
 
-/**
- * Get linked-highlight props for InlineLinkedHighlight from a variable definition.
- * Extracts the `color` and `bgColor` fields.
- *
- * @example
- * <InlineLinkedHighlight
- *     varName="activeHighlight"
- *     highlightId="radius"
- *     {...linkedHighlightPropsFromDefinition(getVariableInfo('activeHighlight'))}
- * >
- *     radius
- * </InlineLinkedHighlight>
- */
 export function linkedHighlightPropsFromDefinition(def: VariableDefinition | undefined): {
     color?: string;
     bgColor?: string;
@@ -304,20 +420,6 @@ export function linkedHighlightPropsFromDefinition(def: VariableDefinition | und
     };
 }
 
-/**
- * Build the `variables` prop for FormulaBlock from variable definitions.
- *
- * Takes an array of variable names and returns the config map expected by
- * `<FormulaBlock variables={...} />`.
- *
- * @example
- * import { scrubVarsFromDefinitions } from './variables';
- *
- * <FormulaBlock
- *     latex="\scrub{mass} \times \scrub{accel}"
- *     variables={scrubVarsFromDefinitions(['mass', 'accel'])}
- * />
- */
 export function scrubVarsFromDefinitions(
     varNames: string[],
 ): Record<string, { min?: number; max?: number; step?: number; color?: string }> {
