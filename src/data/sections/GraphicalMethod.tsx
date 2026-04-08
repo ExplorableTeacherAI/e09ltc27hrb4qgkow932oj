@@ -29,6 +29,7 @@ function InteractiveConstraintBuilder() {
     // Read constraint intercepts from store
     const c1Intercept = useVar("constraint1Intercept", 6) as number; // Labor: y-intercept
     const c2Intercept = useVar("constraint2Intercept", 10) as number; // Material: y-intercept
+    const zoom = useVar("graphZoom", 10) as number; // Zoom level (max visible value)
 
     // Constraint 1 (Labor): 2x + 3y ≤ 18 → y = c1Intercept - (2/3)x
     // x-intercept: when y=0, x = c1Intercept * 1.5
@@ -94,7 +95,7 @@ function InteractiveConstraintBuilder() {
         <div className="relative">
             <Cartesian2D
                 height={400}
-                viewBox={{ x: [-1, 10], y: [-1, 10] }}
+                viewBox={{ x: [-1, zoom], y: [-1, zoom] }}
                 movablePoints={[
                     {
                         initial: [0, c1Intercept],
@@ -122,8 +123,8 @@ function InteractiveConstraintBuilder() {
                     },
 
                     // Non-negativity constraints (axes)
-                    { type: "segment", point1: [0, 0], point2: [10, 0], color: "#94a3b8", weight: 2 },
-                    { type: "segment", point1: [0, 0], point2: [0, 10], color: "#94a3b8", weight: 2 },
+                    { type: "segment", point1: [0, 0], point2: [zoom, 0], color: "#94a3b8", weight: 2 },
+                    { type: "segment", point1: [0, 0], point2: [0, zoom], color: "#94a3b8", weight: 2 },
 
                     // Constraint 1 line (Labor): y = c1Intercept - (2/3)x
                     {
@@ -160,6 +161,24 @@ function InteractiveConstraintBuilder() {
                     },
                 ]}
             />
+            {/* Zoom controls */}
+            <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                <button
+                    onClick={() => setVar("graphZoom", Math.min(20, zoom + 2))}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors"
+                    title="Zoom out"
+                >
+                    −
+                </button>
+                <span className="text-sm text-slate-600 min-w-[3rem] text-center">{zoom}</span>
+                <button
+                    onClick={() => setVar("graphZoom", Math.max(6, zoom - 2))}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors"
+                    title="Zoom in"
+                >
+                    +
+                </button>
+            </div>
         </div>
     );
 }

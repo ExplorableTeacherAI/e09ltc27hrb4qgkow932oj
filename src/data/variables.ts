@@ -97,6 +97,16 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         step: 0.5,
         color: '#AC8BF9',
     },
+    graphZoom: {
+        defaultValue: 10,
+        type: 'number',
+        label: 'Graph Zoom',
+        description: 'Zoom level for the coordinate system (max visible value on axes)',
+        min: 6,
+        max: 20,
+        step: 1,
+        color: '#64748b',
+    },
 
     // Corner point exploration
     cornerX: {
