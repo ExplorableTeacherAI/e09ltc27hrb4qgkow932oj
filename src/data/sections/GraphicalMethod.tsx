@@ -134,6 +134,14 @@ function InteractiveConstraintBuilder() {
                         weight: 3,
                         domain: [0, c1XIntercept] as [number, number],
                     },
+                    // Label for Constraint 1
+                    {
+                        type: "label",
+                        x: c1XIntercept * 0.4,
+                        y: c1Intercept - (2/3) * (c1XIntercept * 0.4) + 0.6,
+                        text: "2x + 3y = " + Math.round(c1Intercept * 3),
+                        color: "#F7B23B",
+                    },
 
                     // Constraint 2 line (Material): y = c2Intercept - 2x
                     {
@@ -142,6 +150,14 @@ function InteractiveConstraintBuilder() {
                         color: "#AC8BF9",
                         weight: 3,
                         domain: [0, c2XIntercept] as [number, number],
+                    },
+                    // Label for Constraint 2
+                    {
+                        type: "label",
+                        x: c2XIntercept * 0.5,
+                        y: c2Intercept - 2 * (c2XIntercept * 0.5) + 0.6,
+                        text: "4x + 2y = " + Math.round(c2Intercept * 2),
+                        color: "#AC8BF9",
                     },
 
                     // Feasible region corner points
