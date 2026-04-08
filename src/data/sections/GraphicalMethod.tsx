@@ -134,12 +134,12 @@ function InteractiveConstraintBuilder() {
                         weight: 3,
                         domain: [0, c1XIntercept] as [number, number],
                     },
-                    // Label for Constraint 1
+                    // Equation label for Constraint 1 (Labor)
                     {
                         type: "label",
-                        x: c1XIntercept * 0.4,
-                        y: c1Intercept - (2/3) * (c1XIntercept * 0.4) + 0.6,
-                        text: "2x + 3y = " + Math.round(c1Intercept * 3),
+                        x: c1XIntercept * 0.55,
+                        y: c1Intercept - (2/3) * (c1XIntercept * 0.55) + 0.8,
+                        text: "y = " + c1Intercept + " − ⅔x",
                         color: "#F7B23B",
                     },
 
@@ -151,12 +151,12 @@ function InteractiveConstraintBuilder() {
                         weight: 3,
                         domain: [0, c2XIntercept] as [number, number],
                     },
-                    // Label for Constraint 2
+                    // Equation label for Constraint 2 (Material)
                     {
                         type: "label",
-                        x: c2XIntercept * 0.5,
-                        y: c2Intercept - 2 * (c2XIntercept * 0.5) + 0.6,
-                        text: "4x + 2y = " + Math.round(c2Intercept * 2),
+                        x: c2XIntercept * 0.6,
+                        y: c2Intercept - 2 * (c2XIntercept * 0.6) + 0.8,
+                        text: "y = " + c2Intercept + " − 2x",
                         color: "#AC8BF9",
                     },
 
